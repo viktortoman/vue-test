@@ -1,5 +1,5 @@
 <template>
-    <div class="container mx-auto rounded-xl shadow border p-8 m-10">
+    <div class="container mx-auto">
         <MainComponent></MainComponent>
     </div>
 </template>
