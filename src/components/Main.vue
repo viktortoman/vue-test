@@ -10,23 +10,20 @@
                 Toggle
             </button>
         </header>
-        <div class="flex items-center justify-center h-screen" v-show="toggle">
+        <div class="flex items-center justify-center h-screen" v-if="selectedData" v-show="toggle">
             <div class="rounded-border shadow border border-4 text-white w-3/5 p-3 break-words">
-                <div class="green-box rounded-t-lg py-6 px-36 text-3xl text-center uppercase">
-                    <span class="letter">Rocket League Showdown 2020 Summer Shuffle</span>
+                <div class="box rounded-t-lg py-6 px-36 text-3xl text-center uppercase"
+                     :style="{ 'background-color': selectedData.color }">
+                    <span class="letter">{{ selectedData.name }}</span>
                 </div>
                 <div class="p-4 bg-white text-[#262626] text-center text-xl mt-3 mb-3 text-center">
-                    <span class="letter">June 29 - July 12</span>
+                    <span class="letter">{{ selectedDataFrom + ' - ' + selectedDataTo  }}</span>
                 </div>
                 <div class="flex flex-row gap-2">
-                    <div class="flex-1 green-box rounded-bl-lg p-6 text-3xl">
-                        <span class="letter">EterNaLeNvy</span>
-                    </div>
-                    <div class="flex-1 green-box p-6 text-3xl text-center">
-                        <span class="letter">DakotaCox</span>
-                    </div>
-                    <div class="flex-1 green-box rounded-br-lg p-6 text-3xl text-right">
-                        <span class="letter">Sarah Jessica Parker</span>
+                    <div class="flex-1 box p-6 text-3xl" :class="getBorderClass(selectedData.talent, index)"
+                         :style="{ 'background-color': selectedData.color }"
+                         v-for="(talent, index) in selectedData.talent" :key="talent">
+                        <span class="letter" :id="index">{{ talent }}</span>
                     </div>
                 </div>
             </div>
@@ -36,7 +33,8 @@
 
 <script>
 import anime from "animejs";
-import {ref} from "vue";
+import moment from "moment";
+import data from '../assets/data.json'
 
 export default {
     name: "MainComponent",
@@ -44,32 +42,68 @@ export default {
     data() {
         return {
             toggle: false,
+            data: data,
+            selectedData: {
+                name: '',
+                from: '',
+                to: '',
+                color: '',
+                talent: [],
+            },
+            selectedDataFrom: '',
+            selectedDataTo: '',
         }
     },
-    computed: {},
+    mounted() {
+        this.setSelectedData();
+    },
     methods: {
+        getBorderClass(talent, index) {
+            if (talent.length === 1) {
+                if (index === 0) {
+                    return 'rounded-b-lg';
+                }
+            } else if (talent.length === 2) {
+                if (index === 0) {
+                    return 'rounded-bl-lg';
+                }
+
+                if (index === 1) {
+                    return 'rounded-br-lg';
+                }
+            } else if(talent.length === 3) {
+                if (index === 0) {
+                    return 'rounded-bl-lg';
+                }
+
+                if (index === 2) {
+                    return 'rounded-br-lg';
+                }
+            }
+        },
+        getRandomElement() {
+            let randomIndex = Math.floor(Math.random() * this.data.length);
+            return this.data[randomIndex] ? this.data[randomIndex] : null;
+        },
+        setSelectedData() {
+            this.selectedData = this.getRandomElement() ? this.getRandomElement() : this.data[0];
+            this.selectedDataTo = moment(this.selectedData.to).format("MMMM DD")
+            this.selectedDataFrom = moment(this.selectedData.from).format("MMMM DD")
+        },
         toggleData() {
             this.toggle = true
-
-            let letter = document.querySelector('.letter');
-            letter.innerHTML = letter.textContent.replace(/\S/g, "<span class='letter'>$&</span>");
+            this.setSelectedData();
 
             anime.timeline({loop: false})
                 .add({
                     targets: '.letter',
                     scale: [7,1],
                     opacity: [0,1],
-                    translateZ: 120,
+                    translateX: 250,
                     easing: "easeOutExpo",
                     duration: 1500,
-                    delay: (el, i) => 70*i
-                }).add({
-                targets: '.ml2',
-                opacity: 0,
-                duration: 1000,
-                easing: "easeOutExpo",
-                delay: 10000
-            });
+                    delay: (el, i) => 30 * i
+                });
         }
     }
 }
@@ -82,8 +116,7 @@ export default {
     border-radius: 25px;
 }
 
-.green-box {
-    background: #00D487;
+.box {
     text-shadow: 2px 2px 2px #0A0403;
     font-weight: 600;
     line-height: 0.9em;

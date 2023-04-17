@@ -12,6 +12,7 @@
     "babel-eslint": "^10.1.0",
     "core-js": "^3.8.3",
     "eslint-plugin-html": "^7.1.0",
+    "moment": "^2.29.4",
     "vue": "^3.2.13"
   },
   "devDependencies": {
